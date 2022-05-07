@@ -4,7 +4,7 @@ set -euo pipefail
 
 GH_REPO="https://github.com/zegl/kube-score"
 TOOL_NAME="kube-score"
-TOOL_TEST="kube-score --help"
+TOOL_TEST="kube-score version"
 
 fail() {
   echo -e "asdf-$TOOL_NAME: $*"
@@ -68,11 +68,19 @@ install_version() {
   fi
 
   (
-    mkdir -p "$install_path"
-    cp -r "$ASDF_DOWNLOAD_PATH"/* "$install_path"
-
     local tool_cmd
     tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
+
+    if [ -f "$ASDF_DOWNLOAD_PATH/bin/$tool_cmd" ]; then
+      mkdir -p "$install_path"
+      cp -r "$ASDF_DOWNLOAD_PATH"/* "$install_path"
+    elif [ -f "$ASDF_DOWNLOAD_PATH/$tool_cmd" ]; then
+      mkdir -p "$install_path/bin"
+      cp -r "$ASDF_DOWNLOAD_PATH"/* "$install_path/bin"
+    else
+      fail "Could not found $ASDF_DOWNLOAD_PATH/[bin/]$tool_cmd"
+    fi
+
     test -x "$install_path/bin/$tool_cmd" || fail "Expected $install_path/bin/$tool_cmd to be executable."
 
     echo "$TOOL_NAME $version installation was successful!"
