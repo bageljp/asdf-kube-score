@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-# TODO: Ensure this is the correct GitHub homepage where releases can be downloaded for kube-score.
 GH_REPO="https://github.com/zegl/kube-score"
 TOOL_NAME="kube-score"
 TOOL_TEST="kube-score --help"
@@ -31,18 +30,29 @@ list_github_tags() {
 }
 
 list_all_versions() {
-  # TODO: Adapt this. By default we simply list the tag names from GitHub releases.
-  # Change this function if kube-score has other means of determining installable versions.
   list_github_tags
+}
+
+get_arch() {
+  ARCH=$(uname -m)
+  case "$ARCH" in
+  armv*) ARCH="arm" ;;
+  aarch64) ARCH="arm64" ;;
+  x86) ARCH="386" ;;
+  x86_64) ARCH="amd64" ;;
+  i686) ARCH="386" ;;
+  i386) ARCH="386" ;;
+  esac
+  echo "$ARCH"
 }
 
 download_release() {
   local version filename url
   version="$1"
   filename="$2"
+  os="$(uname | tr '[:upper:]' '[:lower:]')"
 
-  # TODO: Adapt the release URL convention for kube-score
-  url="$GH_REPO/archive/v${version}.tar.gz"
+  url="$GH_REPO/releases/download/v${version}/kube-score_${version}_${os}_$(get_arch)"
 
   echo "* Downloading $TOOL_NAME release $version..."
   curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
@@ -61,7 +71,6 @@ install_version() {
     mkdir -p "$install_path"
     cp -r "$ASDF_DOWNLOAD_PATH"/* "$install_path"
 
-    # TODO: Asert kube-score executable exists.
     local tool_cmd
     tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
     test -x "$install_path/bin/$tool_cmd" || fail "Expected $install_path/bin/$tool_cmd to be executable."
