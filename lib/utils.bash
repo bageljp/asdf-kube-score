@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-set -x
 
 GH_REPO="https://github.com/zegl/kube-score"
 TOOL_NAME="kube-score"
-TOOL_TEST="kube-score --help"
+TOOL_TEST="kube-score version"
 
 fail() {
   echo -e "asdf-$TOOL_NAME: $*"

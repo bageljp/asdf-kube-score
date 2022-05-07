@@ -42,7 +42,7 @@ asdf install kube-score latest
 asdf global kube-score latest
 
 # Now kube-score commands are available
-kube-score --help
+kube-score version
 ```
 
 Check [asdf](https://github.com/asdf-vm/asdf) readme for more instructions on how to
